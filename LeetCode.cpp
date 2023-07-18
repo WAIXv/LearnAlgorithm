@@ -1012,33 +1012,180 @@ public:
 	}
 };
 
-class Solution {
+class Solution_4 {
 public:
-	Node* copyRandomList(Node* head) {
-		Node* ret = new Node(head->val);
+    Node* copyRandomList(Node* head) {
+        for(auto p = head; p != nullptr; p = p->next->next)
+        {
+            Node* newNode = new Node(p->val);
+            newNode->next = p->next;
+            p->next = newNode;
+        }
         
+        for(auto p = head; p != nullptr; p = p->next->next)
+        {
+            p->next->random = p->random == nullptr ? nullptr : p->random->next;
+        }
 
-        return ;
-	}
+        Node* ret = head->next;
+        for(auto p = head; p != nullptr; p = p->next)
+        {
+            auto nodeNew = p->next;
+            p->next = p->next->next;
+            nodeNew->next = p->next == nullptr ? nullptr : p->next->next;
+        }
+
+        return ret;
+    }
 };
 #pragma endregion
 
+#pragma region 剑指18.删除链表的节点
+
+class Solution_5 {
+public:
+    ListNode* deleteNode(ListNode* head, int val) {
+        if(!head) return head;
+
+        for(auto p1 = head, p2 = head->next; p2 != nullptr; (p1 = p2,p2 = p2->next))
+        {
+            if(p2->val == val)
+            {
+                p1->next = p2->next;
+                return head;
+            }
+        }
+    }
+};
+
+#pragma endregion 
+
+#pragma region 剑指22.链表中倒数的第k个节点
+
+class Solution_6 {
+public:
+    ListNode* getKthFromEnd(ListNode* head, int k) {
+        ListNode* fast = head;
+        while(k > 0)
+        {
+            fast = fast->next;
+            k--;
+        }
+
+        while(fast)
+        {
+            head = head->next;
+            fast = fast->next;
+        }
+
+        return head;
+    }
+};
+
+#pragma endregion
+
+#pragma region 剑指25.合并两个排序的链表
+
+class Solution_7 {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        ListNode head{-1};
+
+        ListNode* prev = &head;
+        while(l1 != nullptr && l2 != nullptr)
+        {
+            if(l1->val > l2->val)
+            {
+                prev->next = l2;
+                l2 = l2->next;
+            }
+            else
+            {
+                prev->next = l1;
+                l1 = l1->next;
+            }
+            prev = prev->next;
+        }
+
+        prev->next = l1 == nullptr ? l2 : l1;
+
+        return head.next;
+    }
+};
+
+#pragma endregion
+
+#pragma region 剑指52.两个链表的第一个公共节点
+
+class Solution_8 {
+public:
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        if(headA == nullptr || headB == nullptr) return nullptr;
+        
+        int n1 = 0;
+        int n2 = 0;
+        
+        for(const auto* p = headA; p != nullptr; p = p->next)
+        {
+            n1++;
+        }
+        for(const auto* p = headB; p != nullptr; p = p->next)
+        {
+            n2++;
+        }
+
+        int diff = n1 - n2;
+        if(diff > 0)
+        {
+            for(int i = diff; diff != 0; diff--)
+            {
+                headA=headA->next;
+            }
+        }
+        else if(diff < 0)
+        {
+            for(int i = diff; diff != 0; diff++)
+            {
+                headB=headB->next;
+            }
+        }
+
+        while(headA != headB)
+        {
+            if(headA == nullptr) return nullptr;
+            headA = headA->next;
+            headB = headB->next;
+        }
+
+        return headA;
+    }
+};
+
+#pragma endregion 
+
 int main()
 {
-    Solution_3 solu = Solution_3();
-    ListNode l1(1);
-	ListNode l2(2);
-	ListNode l3(3);
-	ListNode l4(4);
-	ListNode l5(5);
-
-    l1.next = &l2;
-    l2.next = &l3;
-	l3.next = &l4;
-	l4.next = &l5;
+    ListNode n1{4};
+    ListNode n2{1};
+    ListNode n3{8};
+    ListNode n4{4};
+    ListNode n5{5};
+    ListNode n6{5};
+    ListNode n7{0};
+    ListNode n8{1};
 
 
+    n1.next = &n2;
+    n2.next = &n3;
+    n3.next = &n4;
+    n4.next = &n5;
+    n6.next = &n7;
+    n7.next = &n8;
+    n8.next = &n3;
 
-    solu.reverseList(&l1);
+    Solution_8 solu{};
+    solu.getIntersectionNode(&n1,&n6);
+
+    
     return 0;
 }
