@@ -2,6 +2,7 @@
 #include <map>
 #include <vector>
 #include <queue>
+#include <stack>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -1161,31 +1162,126 @@ public:
     }
 };
 
+#pragma endregion
+
+#pragma region 剑指21.调整数组顺序使奇数位于偶数前面
+class Solution_9 {
+public:
+    vector<int> exchange(vector<int>& nums) {
+        if(nums.size() < 2) return nums;
+        
+        int fast = nums.size() - 1;
+        int slow = 0;
+
+        while(slow != fast)
+        {
+            if(nums[slow] % 2 != 0 && slow != fast)
+                slow++;
+
+            if(nums[fast] % 2 == 0 && slow != fast)
+                fast--;
+            
+            if(nums[slow] % 2 == 0 && nums[fast] % 2 != 0)
+            {
+                const int tmp = nums[slow];
+                nums[slow] = nums[fast];
+                nums[fast] = tmp;
+                slow++;
+            }
+        }
+
+        return nums;
+    }
+};
 #pragma endregion 
+
+#pragma region 剑指57.和为s的两个数字
+
+class Solution_10 {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        int n = nums.size();
+        if(n<2) return nums;
+        
+        int front{0},back{n-1};
+        int mid;
+        int sum;
+        while(front != back)
+        {
+            sum = nums[front] + nums[back];
+            if(sum == target)
+            {
+                return vector<int>{nums[front],nums[back]};
+            }
+
+            if(sum > target)
+            {
+                mid = (front + back) / 2;
+                if(nums[front] + nums[mid] > target)
+                    back = mid - 1;
+                else if(nums[front] + nums[mid] < target)
+                    --back;
+                else
+                    return vector<int>{nums[front],nums[mid]};
+            }
+            else
+            {
+                ++front;
+            }
+        }
+
+        return vector<int>{0,0};
+    }
+};
+
+#pragma endregion
+
+#pragma region 剑指58.翻转单词顺序
+class Solution_11 {
+public:
+    string reverseWords(string s) {
+        if(s.empty()) return s;
+        int n = s.length();
+        if(n == 1) return s[0] == ' ' ? "" : s;
+        
+        string res{};
+        stack<char> stack{};
+        int front{s[0] == ' ' ? 1 : 0},back{s[n-1] == ' ' ? n-2 : n-1};
+        
+        while(back >= 0)
+        {
+            if(s[back] != ' ')
+            {
+                while(s[back] != ' ')
+                {
+                    stack.push(s[back]);
+                    --back;
+                    if(back < 0) break;
+                }
+
+                while(!stack.empty())
+                {
+                    res.push_back(stack.top());
+                    ++front;
+                    stack.pop();
+                }
+                res.push_back(' ');
+            }
+
+            --back;
+        }
+
+        return res.empty() ? res : res.erase(res.length()-1);
+    }
+};
+#pragma endregion
 
 int main()
 {
-    ListNode n1{4};
-    ListNode n2{1};
-    ListNode n3{8};
-    ListNode n4{4};
-    ListNode n5{5};
-    ListNode n6{5};
-    ListNode n7{0};
-    ListNode n8{1};
+    string s{"   "};
 
-
-    n1.next = &n2;
-    n2.next = &n3;
-    n3.next = &n4;
-    n4.next = &n5;
-    n6.next = &n7;
-    n7.next = &n8;
-    n8.next = &n3;
-
-    Solution_8 solu{};
-    solu.getIntersectionNode(&n1,&n6);
-
+    Solution_11 solu{};
+    solu.reverseWords(s);
     
     return 0;
 }
