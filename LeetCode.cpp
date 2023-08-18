@@ -9,11 +9,11 @@
 using namespace std;
 
 struct TreeNode {
-	char c;
+	int val;
 	struct TreeNode* left;
 	struct TreeNode* right;
 	TreeNode(int x) :
-		c(x), left(nullptr), right(nullptr) {}
+		val(x), left(nullptr), right(nullptr) {}
 };
 
 struct ListNode {
@@ -1000,13 +1000,13 @@ public:
 #pragma endregion
 
 #pragma region 剑指35.复制复杂链表
-class Node {
+class Node_1 {
 public:
 	int val;
-	Node* next;
-	Node* random;
+	Node_1* next;
+	Node_1* random;
 
-	Node(int _val) {
+	Node_1(int _val) {
 		val = _val;
 		next = nullptr;
 		random = nullptr;
@@ -1015,10 +1015,10 @@ public:
 
 class Solution_4 {
 public:
-    Node* copyRandomList(Node* head) {
+    Node_1* copyRandomList(Node_1* head) {
         for(auto p = head; p != nullptr; p = p->next->next)
         {
-            Node* newNode = new Node(p->val);
+            Node_1* newNode = new Node_1(p->val);
             newNode->next = p->next;
             p->next = newNode;
         }
@@ -1028,7 +1028,7 @@ public:
             p->next->random = p->random == nullptr ? nullptr : p->random->next;
         }
 
-        Node* ret = head->next;
+        Node_1* ret = head->next;
         for(auto p = head; p != nullptr; p = p->next)
         {
             auto nodeNew = p->next;
@@ -1276,12 +1276,146 @@ public:
 };
 #pragma endregion
 
+#pragma region 剑指36.二叉搜索树与双向链表
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+
+    Node() {}
+
+    Node(int _val) {
+        val = _val;
+        left = NULL;
+        right = NULL;
+    }
+
+    Node(int _val, Node* _left, Node* _right) {
+        val = _val;
+        left = _left;
+        right = _right;
+    }
+};
+class Solution_22 {
+public:
+    Node* head;
+    Node* treeToDoublyList(Node* root) {
+        if(root == nullptr) return root;
+        midOrder(root);
+        head->left = prev;
+        prev->right = head;
+        return head;
+    }
+    
+    Node *prev;
+    void midOrder(Node* node)
+    {
+        if(node == nullptr)
+            return;
+
+        midOrder(node->left);
+        if(prev != nullptr) prev->right = node;
+        else head = node;
+        node->left = prev;
+        prev = node;
+        midOrder(node->right);
+    }
+};
+#pragma endregion
+
+#pragma region 剑指54.二叉搜索树的第k大节点
+class Solution_23 {
+public:
+    int res;
+    int kthLargest(TreeNode* root, int k) {
+        if(root == nullptr) return -1;
+        int target = k;
+        midOrder(root,target);
+        return res;
+    }
+
+    int rank;
+    void midOrder(TreeNode* node,int target)
+    {
+        if(node == nullptr)
+            return;
+
+        midOrder(node->right,target);
+        ++rank;
+        if(rank == target)
+        {
+            res = node->val;
+            return;
+        }
+        midOrder(node->left,target);
+    }
+};
+#pragma endregion
+
+#pragma region 剑指55-I.二叉树的深度
+class Solution_24 {
+public:
+    int maxDepth(TreeNode* root) {
+        if(root == nullptr) return 0;
+        return dfs(root,1);
+    }
+    int dfs(TreeNode* root,int depth)
+    {
+        if(root == nullptr)
+            return depth;
+
+        return max(dfs(root->left,depth+1),dfs(root->right,depth+1));
+    }
+};
+#pragma endregion 
+
+#pragma region 剑指55.-II平衡二叉树
+class Solution_25 {
+public:
+    bool res = true;
+    bool isBalanced(TreeNode* root) {
+        if(root == nullptr) return true;
+        backOrder(root,0);
+        return res;
+    }
+
+    int backOrder(TreeNode* node,int depth)
+    {
+        if(node == nullptr || !res)
+            return depth-1;
+
+        int ld = backOrder(node->left,depth+1);
+        int rd = backOrder(node->right,depth+1);
+        depth = max(ld,rd);
+
+        if(abs(ld-rd)  > 1)
+        {
+            res = false;
+            return depth;
+        }
+
+        return depth;
+    }
+};
+#pragma endregion 
+
 int main()
 {
-    string s{"   "};
+    TreeNode n1(1);
+    TreeNode n2(2);
+    TreeNode n3(3);
+    TreeNode n4(3);
+    TreeNode n5(3);
+    TreeNode n6(4);
+    TreeNode n7(4);
 
-    Solution_11 solu{};
-    solu.reverseWords(s);
+    n1.right = &n2;
+    n2.right = &n3;
+    
+
+    Solution_25 solu{};
+    solu.isBalanced(&n1);
     
     return 0;
 }
