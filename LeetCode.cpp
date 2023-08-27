@@ -2,18 +2,20 @@
 #include <map>
 #include <vector>
 #include <queue>
+#include <set>
 #include <stack>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 
 using namespace std;
 
 struct TreeNode {
-	char c;
+	int val;
 	struct TreeNode* left;
 	struct TreeNode* right;
 	TreeNode(int x) :
-		c(x), left(nullptr), right(nullptr) {}
+		val(x), left(nullptr), right(nullptr) {}
 };
 
 struct ListNode {
@@ -1000,13 +1002,13 @@ public:
 #pragma endregion
 
 #pragma region 剑指35.复制复杂链表
-class Node {
+class Node_1 {
 public:
 	int val;
-	Node* next;
-	Node* random;
+	Node_1* next;
+	Node_1* random;
 
-	Node(int _val) {
+	Node_1(int _val) {
 		val = _val;
 		next = nullptr;
 		random = nullptr;
@@ -1015,10 +1017,10 @@ public:
 
 class Solution_4 {
 public:
-    Node* copyRandomList(Node* head) {
+    Node_1* copyRandomList(Node_1* head) {
         for(auto p = head; p != nullptr; p = p->next->next)
         {
-            Node* newNode = new Node(p->val);
+            Node_1* newNode = new Node_1(p->val);
             newNode->next = p->next;
             p->next = newNode;
         }
@@ -1028,7 +1030,7 @@ public:
             p->next->random = p->random == nullptr ? nullptr : p->random->next;
         }
 
-        Node* ret = head->next;
+        Node_1* ret = head->next;
         for(auto p = head; p != nullptr; p = p->next)
         {
             auto nodeNew = p->next;
@@ -1276,12 +1278,1287 @@ public:
 };
 #pragma endregion
 
-int main()
-{
-    string s{"   "};
+#pragma region 剑指09.两个栈实现队列
+class CQueue {
+private:
+    stack<int> instack{},outstack{};
 
-    Solution_11 solu{};
-    solu.reverseWords(s);
+    void in2out()
+    {
+        while(!instack.empty())
+        {
+            outstack.push(instack.top());
+            instack.pop();
+        }
+    }
+public:
+    CQueue() {
+        
+    }
+    
+    void appendTail(int value) {
+        instack.push(value);
+    }
+    
+    int deleteHead() {
+        if(outstack.empty())
+        {
+            if(instack.empty())
+            {
+                return -1;
+            }
+            in2out();
+        }
+
+        int ret = outstack.top();
+        outstack.pop();
+
+        return ret;
+    }
+};
+
+/**
+ * Your CQueue object will be instantiated and called as such:
+ * CQueue* obj = new CQueue();
+ * obj->appendTail(value);
+ * int param_2 = obj->deleteHead();
+ */
+#pragma endregion
+
+#pragma region 剑指30.包含min函数的栈
+class MinStack {
+private:
+    stack<int> minstack{};
+    stack<int> s{};
+public:
+    /** initialize your data structure here. */
+    MinStack() {
+        minstack.push(INT_MAX);
+    }
+    
+    void push(int x) {
+        minstack.push(::min(x,minstack.top()));
+        s.push(x);
+    }
+    
+    void pop() {
+        s.pop();
+        minstack.pop();
+    }
+    
+    int top() {
+        return s.top();
+    }
+    
+    int min() {
+        return minstack.top();
+    }
+};
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack* obj = new MinStack();
+ * obj->push(x);
+ * obj->pop();
+ * int param_3 = obj->top();
+ * int param_4 = obj->min();
+ */
+#pragma endregion
+
+#pragma region 剑指59.队列最大值
+class MaxQueue {
+private:
+    queue<int> q{};
+    stack<int> maxStack{};
+    int prevMax;
+public:
+    MaxQueue() {
+        maxStack.push(INT_MIN);
+    }
+    
+    int max_value() {
+        return maxStack.top();
+    }
+    
+    void push_back(int value) {
+        q.push(value);
+        maxStack.push(value > maxStack.top() ? value : maxStack.top());
+    }
+    
+    int pop_front() {
+       int res = q.back();
+        q.pop();
+
+        
+        return res;
+    }
+};
+
+/**
+ * Your MaxQueue object will be instantiated and called as such:
+ * MaxQueue* obj = new MaxQueue();
+ * int param_1 = obj->max_value();
+ * obj->push_back(value);
+ * int param_3 = obj->pop_front();
+ */
+#pragma endregion
+
+#pragma region 剑指32.从上到下打印二叉树
+
+class Solution_12 {
+private:
+    vector<int> res;
+    
+public:
+    vector<int> levelOrder(TreeNode* root) {
+        if(root == nullptr) return res;
+
+        queue<TreeNode*> queue;
+        queue.push(root);
+        while(!queue.empty())
+        {
+            int size = queue.size();
+            for(int i = 0; i < size; i++)
+            {
+                auto tmp = queue.front();
+                queue.pop();
+                if(tmp->left != nullptr) queue.push(tmp->left);
+                if(tmp->right != nullptr) queue.push(tmp->right);
+                res.push_back(tmp->val);
+            }
+        }
+
+        return res;
+    }
+};
+
+#pragma endregion
+
+#pragma region 剑指53-I.排序数组中查找数字
+class Solution_13
+{
+public:
+    int search(vector<int>& nums, int target) {
+        int n = nums.size();
+
+        int left = binarySearch(nums, target, true,0,n-1);
+        int right = binarySearch(nums, target, false,left,n-1);
+
+        return right-left +1;
+    }
+    
+    int binarySearch(vector<int>& nums, int target, bool lower,int start, int end)
+    {
+        int left{start},right{end},mid;
+
+        while(right >= left)
+        {
+            mid = left + (right - left) / 2;
+            if(nums[mid] > target) {
+                right = mid - 1;
+            }
+            else if(nums[mid] < target){
+                left = mid + 1;
+            }
+            else if(nums[mid] == target){
+                if(lower){
+                    right = mid - 1;
+                }
+                else{
+                    left = mid + 1;
+                }
+            }
+        }
+        return lower ? left :right;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指53-II.0~n-1中缺失的数字
+class Solution_14 {
+public:
+    int missingNumber(vector<int>& nums) {
+        int n = nums.size();
+        if(n==1) return nums[0] == 0 ? 1 : 0;
+        if(nums[n-1] == n-1) return n;
+        if(nums[0] != 0) return 0;
+        
+
+        int left{0},right{n-1},mid;
+        while(right >= left)
+        {
+            mid = left + (right - left) / 2;
+            if(nums[mid] > mid)
+            {
+                right = mid - 1;
+            }
+            else if(nums[mid] == mid)
+            {
+                left = mid + 1;
+            }
+        }
+
+        return nums[mid] == mid ? mid + 1 : mid;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指04.查找二维数组
+class Solution_15 {
+public:
+    bool findNumberIn2DArray(vector<vector<int>>& matrix, int target) {
+        if(matrix.empty()) return false;
+        if(matrix[0].empty()) return false;
+        
+        int top{0},down{(int)matrix.size()-1},mid{};
+        for(int i = 0; i < matrix.size(); ++i)
+        {
+            if(matrix[i][0] <= target && matrix[i][matrix[i].size()-1] >= target)
+            {
+                if(binarySearch(matrix[i],target))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+    
+    bool binarySearch(vector<int>& nums,const int& target)
+    {
+        int left{0},right{(int)nums.size()-1},mid;
+        while(left<=right)
+        {
+            mid = left + (right - left) / 2;
+            if(nums[mid] < target)
+            {
+                left = mid+1;
+            }
+            else if(nums[mid] > target)
+            {
+                right = mid - 1;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指11.旋转数组最小数值
+class Solution_16 {
+public:
+    int minArray(vector<int>& numbers) {
+        const int n = numbers.size() - 1;
+        if(n==0) return numbers[0];
+        if(n==1) return min(numbers[0],numbers[1]);
+        if(numbers[n]>numbers[0]) return numbers[0];
+        
+        int l{0},r{(int)numbers.size()-1},mid;
+        while(r>=l)
+        {
+            mid = l + (r-l)/2;
+            if(numbers[mid] < numbers[r])
+            {
+                r = mid;
+            }
+            else if(numbers[mid] > numbers[r])
+            {
+                l = mid + 1;
+            }
+            else
+            {
+                --r;
+            }
+        }
+
+        return numbers[l];
+    }
+};
+#pragma endregion
+
+#pragma region 剑指50.第一个只出现一次的字符
+class Solution_17 {
+public:
+    char firstUniqChar(string s) {
+        unordered_map<char,int> map{};
+        for (auto c : s)
+        {
+            ++map[c];
+        }
+        for(int i = 0; i < s.size(); ++i)
+        {
+            if(map[s[i]] == 1)
+                return s[i];
+        }
+
+        return ' ';
+    }
+};
+#pragma endregion
+
+#pragma region 剑指32.从上到下打印二叉树
+class Solution_18 {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>> res{};
+        if(root == nullptr) return res;
+
+        int depth = 1;
+        queue<TreeNode*> q;
+        q.push(root);
+        while(!q.empty())
+        {
+            int size = q.size();
+            vector<int> line{};
+            for(int i = size; i > 0; --i)
+            {
+                auto t = q.front();
+                line.push_back(t->val);
+                if(t->left != nullptr) q.push(t->left);
+                if(t->right != nullptr) q.push(t->right);
+                q.pop();
+            }
+            ++depth;
+            if(depth % 2 == 1)
+                reverse(line.begin(),line.end());
+            res.push_back(line);
+        }
+
+        return res;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指12.矩阵中的路径
+class Solution_19 {
+private:
+    int x,y;
+    string s;
+    vector<vector<bool>> visited;
+public:
+    bool exist(vector<vector<char>>& board, string word) {
+        x = board.size();
+        y = board[0].size();
+        s = word;
+        if(word.size() > x*y) return false;
+        
+        visited = vector<vector<bool>>(x,vector<bool>(y,false));
+
+        for(int i = 0; i < x; ++i)
+        {
+            for(int j = 0; j < y; ++j)
+            {
+                if(dfs(board,0,i,j))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool dfs(vector<vector<char>>& board, int index, int i, int j)
+    {
+        if(board[i][j] != s[index])
+            return false;
+        else if(index == s.length() - 1)
+            return true;
+
+        bool res = false;
+        visited[i][j] = true;
+        vector<pair<int,int>> directions{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+        for(auto dir : directions)
+        {
+            int newi = i + dir.first, newj = j + dir.second;
+            if(newi < 0 || newi >= x || newj < 0 || newj >= y)
+                continue;
+
+            if(!visited[newi][newj])
+            {
+                if(dfs(board,index+1,newi,newj))
+                {
+                    res = true;
+                    break;
+                }
+            }
+        }
+        visited[i][j] = false;
+        return res;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指34.二叉树中和为某一值的路径
+class Solution_20 {
+private:
+    
+public:
+    vector<vector<int>> pathSum(TreeNode* root, int target) {
+        vector<vector<int>> res{};
+        vector<int> path{};
+        dfs(res,path,target,root);
+
+        return res;
+    }
+
+    void dfs(vector<vector<int>>& res, vector<int>& path,int target,const TreeNode* node)
+    {
+        if(node == nullptr) return;
+
+        path.push_back(node->val);
+        target -= node->val;
+        if(target == 0 && node->left == nullptr && node->right == nullptr)
+            res.push_back(path); 
+
+        dfs(res,path,target,node->left);
+        dfs(res,path,target,node->right);
+        path.pop_back();
+    }
+};
+#pragma endregion
+
+
+
+#pragma region 剑指13.机器人的运动范围
+class Solution_21 {
+public:
+    int movingCount(int m, int n, int k) {
+        vector<vector<int>> visited(m,vector<int>(n,0));
+        int res = 0;
+        dfs(0,0,m,n,k,res,visited);
+        return res;
+    }
+
+    void dfs(int i, int j,const int m,const int n,const int k, int& res,vector<vector<int>>& visited)
+    {
+        if(i < 0 || i == m || j < 0 || j == n) return;
+        
+        int local = countSum(i)+countSum(j);
+        if(k > local || visited[i][j] == 1) return;
+
+        visited[i][j] = 1;
+        res++;
+        dfs(i+1,j,m,n,k,res,visited);
+        dfs(i,j+1,m,n,k,res,visited);
+        dfs(i-1,j,m,n,k,res,visited);
+        dfs(i,j-1,m,n,k,res,visited);
+    }
+    
+    int countSum(int x)
+    {
+        int sum = 0;
+        while(x > 0)
+        {
+            sum += x %10;
+            x /= 10;
+        }
+        
+        return sum;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指36.二叉搜索树和双向链表
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+
+    Node() {}
+
+    Node(int _val) {
+        val = _val;
+        left = NULL;
+        right = NULL;
+    }
+
+    Node(int _val, Node* _left, Node* _right) {
+        val = _val;
+        left = _left;
+        right = _right;
+    }
+};
+
+#pragma endregion
+
+#pragma region test
+class Solution_22 {
+public:
+    Node* treeToDoublyList(Node* root) {
+        
+    }
+};
+#pragma endregion
+
+#pragma region 雷火测试_1
+class Solution_leiuhuo_1
+{
+private:
+    int target;
+    int min{1},max{1000};
+public:
+    Solution_leiuhuo_1(int x):target(x){}
+
+    void newGuess(int guess)
+    {
+        if(guess == target)
+        {
+            cout<<"Congratulations! You guessed it right!"<<endl;
+        }
+        else if(guess < target)
+        {
+            if(guess < min)
+            {
+                cout << "Are you kidding me?"<<endl;
+                return;
+            }
+            cout<<"It's too small, please keep guessing!"<<endl;
+            min = guess;
+        }
+        else if(guess > target)
+        {
+            if(guess > max)
+            {
+                cout << "Are you kidding me?"<<endl;
+                return;
+            }
+            cout<<"It's too big, please keep guessing!"<<endl;
+            max = guess;
+        }
+    }
+};
+
+int main_1()
+{
+    int length;
+    cin>>length;
+
+    vector<int> inputs;
+    int input;
+    while(cin >> input)
+    {
+        inputs.emplace_back(input);
+    }
+
+    int target = inputs.back();
+    Solution_leiuhuo_1 solu(target);
+    for(int i : inputs)
+    {
+        solu.newGuess(i);
+    }
     
     return 0;
 }
+#pragma endregion
+
+#pragma region 雷火测试_2
+class Solution_leihuo_2
+{
+private:
+    const int a,b,total;
+    bool hasA,hasB;
+    int curLength{0};
+    vector<int> res;
+public:
+    Solution_leihuo_2(int a,int b,int total):a(a),b(b),total(total){};
+
+    bool newGroup(const int id,vector<int>& group)
+    {
+        int length = group.size();
+        if(length + curLength > total)
+            return false;
+        for(int i = 0; i < length; ++i)
+        {
+            if(group[i] == a)
+            {
+                if(!hasA)
+                    hasA = true;
+                else
+                    return false;
+            }
+            else if(group[i] == b)
+            {
+                if(!hasB)
+                    hasB = true;
+                else
+                    return false;
+            }
+        }
+
+        res.push_back(id);
+        if(length + curLength == total)
+        {
+            printTeam();
+        }
+        else
+        {
+            curLength += length;
+        }
+        
+        return true;
+    }
+
+    void printTeam()
+    {
+        for(int i = 0; i < res.size() - 1; ++i)
+        {
+            cout<<res[i]<<" ";
+        }
+        cout<<res.back()<<endl;
+        hasA = false;
+        hasB = false;
+        curLength = 0;
+        res.clear();
+    }
+};
+
+int main_test()
+{
+    
+    list<pair<int,vector<int>>> waitList;
+    vector<vector<int>> matchPool;
+    int n,m,a,b;
+    cin>>n>>m>>a>>b;
+
+    Solution_leihuo_2 solu(a,b,m);
+    for(int x = 1; x <= n; ++x)
+    {
+        int length;
+        cin>>length;
+        vector<int> group;
+        for(int i = 0; i < length; ++i)
+        {
+            int input;
+            cin>>input;
+            group.emplace_back(input);
+        }
+        matchPool.push_back(group);
+    }
+
+    for(int x = 1; x <= n; ++x)
+    {
+        auto group = matchPool[x-1];
+        if(waitList.empty())
+        {
+            bool flag = solu.newGroup(x,group);
+            if(!flag)
+                waitList.push_back(make_pair(x,group));
+        }
+        else
+        {
+            waitList.push_back(make_pair(x,group));
+            for(auto it = waitList.begin(); it != waitList.end();)
+            {
+                bool flag = solu.newGroup(it->first,it->second);
+                if(flag)
+                {
+                    waitList.erase(it);
+                    break;
+                }
+                ++it;
+            }
+        }
+    }
+
+    return 0;
+}
+#pragma endregion 
+
+#pragma region 剑指Offer68.二叉搜索树最近公共先祖
+class Solution_30 {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
+    {
+        auto low = p->val < q->val ? p : q;
+        auto high = low == p ? q : p;
+        
+        while(true)
+        {
+            if(root->val < low->val)
+            {
+                root = root->right;
+            }
+            else if(root->val > high->val)
+            {
+                root = root->left;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return root;
+    }
+    
+};
+#pragma endregion
+
+#pragma region 剑指68-II.二叉树的最近公共先祖
+class Solution_31 {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if(root == nullptr) return root;
+        if(root == p || root == q) return root;
+
+        TreeNode* left = lowestCommonAncestor(root->left,p,q);
+        TreeNode* right = lowestCommonAncestor(root->right,p,q);
+
+        if(left != nullptr || right != nullptr)
+            return root;
+
+        if(left == nullptr && right == nullptr)
+            return nullptr;
+
+        return left == nullptr ? right : left;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指37.序列化二叉树
+class Codec {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        string res{};
+        frontOrderSerialize(root,res);
+
+        return res;
+    }
+
+    void frontOrderSerialize(TreeNode* node,string& res)
+    {
+        if(node == nullptr)
+        {
+            res.push_back('#');
+            return;
+        }
+        
+        res.push_back(node->val);
+        frontOrderSerialize(node->left,res);
+        frontOrderSerialize(node->right,res);
+    }
+    
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        return stringToNode(data);
+    }
+
+    long long index{-1};
+    TreeNode* stringToNode(string& data)
+    {
+        ++index;
+        if(data[index] == '#')
+            return nullptr;
+
+        TreeNode* node = new TreeNode(data[index]);
+        
+        TreeNode* left = stringToNode(data);
+        TreeNode* right = stringToNode(data);
+        node->left = left;
+        node->right = right;
+
+        return node;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指38.字符串排列
+class Solution_32 {
+public:
+    vector<string> res;
+    unordered_set<string> existMap;
+    vector<string> permutation(string s) {
+        string path;
+        string used(s.size(),'0');
+        transvel(s,path,used);
+
+        return res;
+    }
+
+    void transvel(const string& s, string& path, string& used)
+    {
+        if(s.size() == path.size())
+        {
+            if(existMap.find(path) == existMap.end())
+            {
+                res.push_back(path);
+                existMap.insert(path);
+            }
+            
+            return;
+        }
+
+        for(int i = 0; i < s.size(); ++i)
+        {
+            if(used[i] == 1)
+                continue;
+
+            path.push_back(s[i]);
+            used[i] = 1;
+
+            transvel(s,path,used);
+
+            path.pop_back();
+            used[i] = 0;
+        }
+    }
+};
+#pragma endregion
+
+#pragma region 剑指07.重建二叉树
+class Solution_33 {
+public:
+    int size;
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        size = preorder.size() -1;
+        return build(preorder,inorder,0,size,0,size);
+    }
+
+    TreeNode* build(vector<int>& preorder, vector<int>& inorder,int preStart,int preEnd,int inStart,int inEnd)
+    {
+         if(preStart > preEnd || inStart > inEnd)
+            return nullptr;
+        
+        TreeNode* node = new TreeNode(preorder[preStart]);
+        
+        int inRoot = find(inorder.begin(),inorder.end(),node->val) - inorder.begin();
+        
+        int preStart_r = (inRoot - inStart) + preStart + 1;
+        
+        node->left = build(preorder,inorder,preStart+1,preStart_r-1,inStart,inRoot-1);
+        node->right = build(preorder,inorder,preStart_r,preEnd,inRoot+1,inEnd);
+
+        return node;
+    }
+    
+};
+#pragma endregion
+
+#pragma region 剑指16.数值的整数次方
+class Solution_34 {
+public:
+    double myPow(double x, int n) {
+        double res{1};
+
+        if(x == 0) return x;
+        if(n == 0) return 1;
+
+        long long N = n;
+        
+        if(N < 0)
+        {
+            N *= -1;
+            x = 1 / x;
+        }
+        
+        while(N != 1)
+        {
+            if(N % 2 == 1)
+                res *= x;
+            x*=x;
+            N /= 2;
+        }
+        res*=x;
+
+        return res;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指33.二叉搜索树后序遍历序列
+class Solution_35 {
+public:
+    bool verifyPostorder(vector<int>& postorder) {
+        return transverl(postorder,0,postorder.size()-1);
+    }
+    bool transverl(vector<int>& postorder, int startIndex, int endIndex)
+    {
+        if(startIndex >= endIndex)
+            return true;
+        
+        int root = postorder[endIndex];
+        int leftEnd = startIndex-1;
+        for(int i = endIndex; i >= startIndex; --i)
+        {
+            if(postorder[i] < root)
+            {
+                leftEnd = i;
+                break;
+            }
+        }
+        for(int i = leftEnd-1; i >= startIndex; --i)
+        {
+            if(postorder[i] > root)
+                return false;
+        }
+
+        bool left = transverl(postorder,startIndex,leftEnd);
+        bool right = transverl(postorder,leftEnd+1,endIndex-1);
+
+        return left && right;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指17.打印从1到最大的n位数
+class Solution_36 {
+public:
+    vector<int> printNumbers(int n) {
+        if(n == 0) return vector<int>{0};
+        
+        int target{1};
+        int x{10};
+        while(n != 1)
+        {
+            x*=x;
+            if(n % 2 == 1)
+                target *= 10;
+            n /= 2;
+        }
+        target *= x;
+
+        vector<int> res(target);
+        for(int i = 0; i < target; ++i)
+        {
+            res[i] = i;
+        }
+        return res;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指10.I斐波那契数列
+class Solution_37 {
+public:
+    int fib(int n) {
+        if(n < 2) return n;
+        
+        int a{0}, b{1};
+        for(int i = 2; i <= n; ++i)
+        {
+            int tmp = a;
+            a = b;
+            b = (tmp + b) % 1000000007;
+        }
+
+        return b;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指63.股票最大利润
+class Solution_38 {
+public:
+    int maxProfit(vector<int>& prices) {
+        if(prices.size() == 0) return 0;
+        
+        int profit{0}, minPrice{INT_MAX};
+        for(auto price : prices)
+        {
+            minPrice = min(price,minPrice);
+            profit = max(profit,price - minPrice);
+        }
+
+        return profit;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指42.连续子数组最大和
+class Solution_39 {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int n = nums.size();
+        if(n < 1) return 0;
+
+        int max{-101};
+        int curSum{-101};
+        vector<int> dp(n);
+        for(auto num : nums)
+        {
+            curSum = std::max(num,curSum+num);
+            max = std::max(curSum,max);
+        }
+
+        return max;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指47.礼物最大价值
+class Solution_40 {
+public:
+    int maxValue(vector<vector<int>>& grid) {
+        int m{(int)grid.size()};
+        int n{(int)grid[0].size()};
+        int res{0};
+        
+        vector<vector<int>> dp(grid);
+        for(int j = 1; j < m; ++j)
+        {
+            dp[j][0] = dp[j-1][0] + grid[j][0];
+        }
+        for(int i = 1; i < n; ++i)
+        {
+            dp[0][i] = dp[0][i-1] + grid[0][i];
+        }
+        
+        for(int j = 1; j < m; ++j)
+        {
+             for(int i = 1; i < n; ++i)
+            {
+                dp[j][i] = max(dp[j-1][i]+grid[j][i],dp[j][i-1]+grid[j][i]);
+                res = max(dp[j][i],res);
+            }
+        }
+        return res;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指46.数值翻译成字符串
+class Solution_41 {
+public:
+    int translateNum(int num) {
+        
+        string s = to_string(num);
+        int n = s.size();
+        vector<int> dp(n);
+        dp[0] = 0;
+        for(int i = 1; i < n; ++i)
+        {
+            string subs = s.substr(i-1,2);
+            if(subs <= "25" && subs >= "10" )
+                dp[i] = dp[i-1] + 1;
+            else
+                dp[i] = dp[i-1];
+        }
+
+        return dp[n-1]+1;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指48.最长不重复子字符串
+class Solution_42 {
+public:
+    int lengthOfLongestSubstring(string s) {
+
+        int n = s.size();
+        int max{0};
+        int leftIndex{0};
+        unordered_set<char> sub{s[0]};
+        for(int i = 1; i < n; ++i)
+        {
+            if(!sub.count(s[i]))
+            {
+                sub.insert(s[i]);
+                max = std::max(max,(int)sub.size());
+            }
+            else
+            {
+                bool flag = true;
+                while(flag)
+                {
+                    sub.erase(s[leftIndex]);
+                    if(s[leftIndex] == s[i])
+                        flag = false;
+                    ++leftIndex;
+                }
+                sub.insert(s[i]);
+                max = std::max(max,(int)sub.size());
+            }
+        }
+
+        return max;
+    }
+};
+#pragma endregion
+
+#pragma region 剑指49.丑数
+class Solution_43 {
+public:
+    int nthUglyNumber(int n) {
+        int p2{1},p3{1},p5{1};
+        int u2{1},u3{1},u5{1};
+        int p{0};
+        int size = n+1;
+        vector<int> ugly(n+1);
+
+        for(int p = 1; p < n; ++p)
+        {
+            int min = std::min(u2,std::min(u3,u5));
+            ugly[p] = min;
+            cout<<min<<endl;
+            if(min == u2)
+            {
+                u2 = ugly[p2] *2;
+                ++p2;
+            }
+            if(min == u3)
+            {
+                u3 = ugly[p3]*3;
+                ++p3;
+            }
+            if(min == u5)
+            {
+                u5 = ugly[p5]*5;
+                ++p5;
+            }
+        }
+
+        return ugly[n];
+    }
+};
+#pragma endregion
+
+#pragma region 剑指60.n个骰子点数
+class Solution_44 {
+public:
+    vector<double> dicesProbability(int n) {
+        vector<double> dp(6,1.0/6.0);
+        for(int i = 2; i <= n; ++i)
+        {
+            vector<double> tmp(5*i + 1,0);
+            for(int j = 0; j < dp.size(); ++j)
+            {
+                for(int k = 0; k < 6; ++k)
+                {
+                    tmp[j+k] += dp[j] / 6.0;
+                }
+            }
+            dp = tmp;
+        }
+        return dp;
+    }
+};
+#pragma endregion
+
+#pragma region 棋子阵营对调
+class Solution_45
+{
+public:
+    int getMaxPower(vector<int>& powers, string& camps)
+    {
+        int size = powers.size();
+        int max = INT_MIN;
+        vector<int> dp_f(size,0);
+        vector<int> dp_b(size,0);
+
+        dp_f[0] = camps[0] == 'A' ? -powers[0] : powers[0];
+        max = std::max(max,dp_f[0]);
+        for(int i = 1; i < size; ++i)
+        {
+            int t = camps[i] == 'A' ? -powers[i] : powers[i];
+            dp_f[i] = dp_f[i-1] + t;
+            max = std::max(max,dp_f[i]);
+        }
+
+        dp_b[size-1] = camps[size-1] == 'A' ? -powers[size-1] : powers[size-1];
+        max = std::max(max,dp_b[size-1]);
+        for(int i = size - 2; i >= 0; --i)
+        {
+            int t = camps[i] == 'A' ? -powers[i] : powers[i];
+            dp_b[i] = dp_b[i+1] + t;
+            max = std::max(max,dp_b[i]);
+        }
+
+        return max;
+    }
+};
+#pragma endregion
+
+
+class Solution_46
+{
+public:
+    void memmove(int* dest, int* src, int n)
+    {
+        auto p1{dest},p2{src};
+        for(int i = 0; i < n; ++i)
+        {
+            *(dest+i) = *(src+i);
+        }
+    }
+    
+};
+
+
+int main_test_4()
+{
+    int n;
+    cin>>n;
+
+    int* array = new int[n];
+    for(int i = 0; i < n; ++i)
+    {
+        int input;
+        cin>>input;
+        array[i] = input;
+    }
+    int dest,src,size;
+    cin>>dest;
+    cin>>src;
+    cin>>size;
+
+    Solution_46 solu{};
+    solu.memmove(array+dest,array+src,size);
+
+    for(int i = 0; i < n-1; ++i)
+    {
+        cout<<*(array+i)<<" ";
+    }
+    cout<<array[n-1];
+
+    return 0;
+}
+
+
+class Solution
+{
+public:
+    int getArea(vector<pair<int,int>>& points)
+    {
+        int xstart{-1},xend{50001},ystart{-1},yend{50001};
+        int prevx,prevyStart,prevyEnd;
+        int n = points.size();
+        for(int i = 0; i < n-1; i+=2)
+        {
+            if(points[i].first != points[i+1].first)
+                return 0;
+
+            if(i != 0)
+            {
+                
+            }
+        }
+        
+        return 0;
+    }
+};
+
+int main()
+{
+    vector<pair<int,int>> points{};
+    int x,y;
+    while(cin>>x>>y)
+    {
+        points.emplace_back(x,y);
+    }
+
+    sort(points.begin(),points.end());
+    Solution solu{};
+    cout<<solu.getArea(points);
+    
+    return 0;
+}
+
+
+
+
