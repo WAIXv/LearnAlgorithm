@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <map>
 #include <vector>
 #include <queue>
@@ -2543,6 +2543,130 @@ public:
     }
 };
 
+#pragma region 剑指36.二叉搜索树与双向链表
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+
+    Node() {}
+
+    Node(int _val) {
+        val = _val;
+        left = NULL;
+        right = NULL;
+    }
+
+    Node(int _val, Node* _left, Node* _right) {
+        val = _val;
+        left = _left;
+        right = _right;
+    }
+};
+class Solution_22 {
+public:
+    Node* head;
+    Node* treeToDoublyList(Node* root) {
+        if(root == nullptr) return root;
+        midOrder(root);
+        head->left = prev;
+        prev->right = head;
+        return head;
+    }
+    
+    Node *prev;
+    void midOrder(Node* node)
+    {
+        if(node == nullptr)
+            return;
+
+        midOrder(node->left);
+        if(prev != nullptr) prev->right = node;
+        else head = node;
+        node->left = prev;
+        prev = node;
+        midOrder(node->right);
+    }
+};
+#pragma endregion
+
+#pragma region 剑指54.二叉搜索树的第k大节点
+class Solution_23 {
+public:
+    int res;
+    int kthLargest(TreeNode* root, int k) {
+        if(root == nullptr) return -1;
+        int target = k;
+        midOrder(root,target);
+        return res;
+    }
+
+    int rank;
+    void midOrder(TreeNode* node,int target)
+    {
+        if(node == nullptr)
+            return;
+
+        midOrder(node->right,target);
+        ++rank;
+        if(rank == target)
+        {
+            res = node->val;
+            return;
+        }
+        midOrder(node->left,target);
+    }
+};
+#pragma endregion
+
+#pragma region 剑指55-I.二叉树的深度
+class Solution_24 {
+public:
+    int maxDepth(TreeNode* root) {
+        if(root == nullptr) return 0;
+        return dfs(root,1);
+    }
+    int dfs(TreeNode* root,int depth)
+    {
+        if(root == nullptr)
+            return depth;
+
+        return max(dfs(root->left,depth+1),dfs(root->right,depth+1));
+    }
+};
+#pragma endregion 
+
+#pragma region 剑指55.-II平衡二叉树
+class Solution_25 {
+public:
+    bool res = true;
+    bool isBalanced(TreeNode* root) {
+        if(root == nullptr) return true;
+        backOrder(root,0);
+        return res;
+    }
+
+    int backOrder(TreeNode* node,int depth)
+    {
+        if(node == nullptr || !res)
+            return depth-1;
+
+        int ld = backOrder(node->left,depth+1);
+        int rd = backOrder(node->right,depth+1);
+        depth = max(ld,rd);
+
+        if(abs(ld-rd)  > 1)
+        {
+            res = false;
+            return depth;
+        }
+
+        return depth;
+    }
+};
+#pragma endregion 
+
 int main()
 {
     vector<pair<int,int>> points{};
@@ -2555,6 +2679,10 @@ int main()
     sort(points.begin(),points.end());
     Solution solu{};
     cout<<solu.getArea(points);
+    
+
+    Solution_25 solu{};
+    solu.isBalanced(&n1);
     
     return 0;
 }
